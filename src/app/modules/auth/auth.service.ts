@@ -1,0 +1,80 @@
+import config from "../../config";
+import { CustomPayload } from "../../interface";
+import { jwtHelpers } from "../../utils/jwtHelper";
+import { User } from "../user/user.model";
+import { TLogin } from "./auth.interface";
+
+const loginUser = async (payload: TLogin) => {
+  // checking if the user is exist
+  const userData = await User.validateUser(payload.email);
+
+  // Check if the password matches
+  const isPasswordMatch = await User.isPasswordMatched(
+    payload?.password,
+    userData?.password
+  );
+  if (!isPasswordMatch) {
+    throw new Error("Password Incorrect");
+  }
+
+  //create token and send to the client
+  const accessToken = jwtHelpers.generateToken(
+    {
+      email: userData.email,
+      role: userData.role,
+      name: userData.name,
+      image: userData.image,
+    },
+    config.jwt.accessSecret,
+    config.jwt.accessExpiresIn
+  );
+
+  const refreshToken = jwtHelpers.generateToken(
+    {
+      email: userData.email,
+      role: userData.role,
+      name: userData.name,
+      image: userData.image,
+    },
+    config.jwt.refreshSecret,
+    config.jwt.refreshExpiresIn
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
+
+const refreshToken = async (token: string): Promise<{ accessToken: string}> => {
+  // * Verify and decode token
+let decodedData;
+  try {
+    decodedData = jwtHelpers.verifyToken(token, config.jwt.refreshSecret) as CustomPayload;
+  } catch (error) {
+    throw new Error("You are not authorized");
+  }
+
+  // * Validate and extract user from DB.
+  const user = await User.validateUser(decodedData.email);
+
+const accessToken = jwtHelpers.generateToken(
+    {
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      image: user.image
+    },
+    config.jwt.accessSecret,
+    config.jwt.accessExpiresIn
+  );
+
+  return {
+    accessToken
+  };
+};
+
+export const AuthService = {
+  loginUser,
+  refreshToken
+};
