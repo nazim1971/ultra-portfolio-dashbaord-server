@@ -3,6 +3,7 @@ import config from "../../config";
 import { StatusFullError } from "../../error/StatusFullError";
 import { CustomPayload } from "../../interface";
 import { httpStatus } from "../../interface/httpStatus";
+import { ensureExists } from "../../utils/isExist";
 import { jwtHelpers } from "../../utils/jwtHelper";
 import { UserRole, UserStatus } from "./user.constant";
 import { TUser } from "./user.interface";
@@ -30,14 +31,7 @@ const getMyProfile = async (payload: CustomPayload) => {
     status: "ACTIVE",
   }).select("_id email role status image");
 
-  if (!userData) {
-    throw new StatusFullError(
-      false,
-      "NOT_FOUND",
-      httpStatus.NOT_FOUND,
-      "User not found!"
-    );
-  }
+  ensureExists(userData, "User not found!");
 
   return userData;
 };
@@ -115,14 +109,7 @@ const updateStatus = async (
   // Find user by ID
   const userData = await User.findById(userId);
 
-  if (!userData) {
-    throw new StatusFullError(
-      false,
-      'NOT_FOUND',
-      httpStatus.NOT_FOUND,
-      'User not found!'
-    );
-  }
+ ensureExists(userData, "User not found!");
 
   // Update user status and role, return the updated document
   const result = await User.findByIdAndUpdate(

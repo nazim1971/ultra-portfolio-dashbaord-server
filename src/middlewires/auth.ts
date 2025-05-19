@@ -9,7 +9,7 @@ import { httpStatus } from "../app/interface/httpStatus";
 
 const auth = (...roles: UserRole[]) => {
   return catchAsync(async (req, _res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = req.headers.authorization;
 
     // checking if the token is missing
     if (!token) {
