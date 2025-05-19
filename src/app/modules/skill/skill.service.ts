@@ -35,7 +35,9 @@ const getSingleSkill = async (id: string) => {
 };
 
 const updateSkill = async (id: string, payload: Partial<TSkill>) => {
-  return await Skill.findByIdAndUpdate(id, payload, { new: true });
+  const skill =  await Skill.findByIdAndUpdate(id, payload, { new: true });
+   ensureExists(skill, "Skill not found!");
+    return skill;
 };
 
 const deleteSkill = async (id: string) => {
