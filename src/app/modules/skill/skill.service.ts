@@ -1,4 +1,6 @@
 
+import QueryBuilder from '../../builder/queryBuilder';
+import { ensureExists } from '../../utils/isExist';
 import { TSkill } from './skill.interface';
 import { Skill } from './skill.model';
 
@@ -6,12 +8,30 @@ const createSkill = async (payload: TSkill) => {
   return await Skill.create(payload);
 };
 
-const getAllSkills = async () => {
-  return await Skill.find();
+const getAllSkills = async (query: Record<string, unknown>) => {
+  const skillQuery = Skill.find(); // base query
+
+  const queryBuilder = new QueryBuilder<TSkill>(skillQuery, query)
+    .search(['name']) // replace with actual searchable fields in your Skill model
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const skills = await queryBuilder.modelQuery;
+  const meta = await queryBuilder.countTotal();
+
+  return {
+    meta,
+    data: skills,
+  };
 };
 
+
 const getSingleSkill = async (id: string) => {
-  return await Skill.findById(id);
+  const skill =  await Skill.findById(id);
+  ensureExists(skill, "Skill not found!");
+    return skill;
 };
 
 const updateSkill = async (id: string, payload: Partial<TSkill>) => {
@@ -19,7 +39,9 @@ const updateSkill = async (id: string, payload: Partial<TSkill>) => {
 };
 
 const deleteSkill = async (id: string) => {
-  return await Skill.findByIdAndDelete(id);
+  const skill = await Skill.findByIdAndDelete(id);
+  ensureExists(skill, "Skill not found!");
+  return Skill;
 };
 
 export const SkillService = {

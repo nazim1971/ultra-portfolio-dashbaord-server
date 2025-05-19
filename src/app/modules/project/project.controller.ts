@@ -43,8 +43,8 @@ const getProjectById = catchAsync(async (req, res) => {
   });
 });
 
-const getAllProjects = catchAsync(async (_req, res) => {
-  const result = await ProjectService.getAllProjects();
+const getAllProjects = catchAsync(async (req, res) => {
+  const result = await ProjectService.getAllProjects(req.query);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
