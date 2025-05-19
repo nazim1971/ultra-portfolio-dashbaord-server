@@ -21,7 +21,7 @@ const userSchema = new Schema<TUser>(
     },
     role: {
       type: String,
-      enum: Object.keys(USER_ROLE),
+      default: 'USER',
       required: true,
     },
     status: {

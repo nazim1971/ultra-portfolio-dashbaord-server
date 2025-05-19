@@ -23,10 +23,10 @@ UserRoute.patch(
 );
 
 //Get All Users
-UserRoute.get("/", auth(USER_ROLE.ADMIN), UserController.getMyProfile);
+UserRoute.get("/", auth(USER_ROLE.ADMIN), UserController.getAllUsers);
 
 //Get Single User
 UserRoute.get("/:id", auth(USER_ROLE.ADMIN), UserController.getSingleUser);
 
 //Update User Status
-UserRoute.get("/:id/status", auth(USER_ROLE.ADMIN), UserController.updateStatus);
+UserRoute.patch("/:id/status", auth(USER_ROLE.ADMIN), UserController.updateStatus);
