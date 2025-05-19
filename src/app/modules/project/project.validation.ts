@@ -7,6 +7,7 @@ const createProject = z.object({
     liveSiteLink: z.string().url(),
     clientCodeLink: z.string().url(),
     serverCodeLink: z.string().url(),
+    images: z.array(z.string()).optional()
   }),
 });
 
@@ -17,6 +18,7 @@ const updateProject = z.object({
     liveSiteLink: z.string().url().optional(),
     clientCodeLink: z.string().url().optional(),
     serverCodeLink: z.string().url().optional(),
+    images: z.array(z.string()).optional()
   }),
 });
 

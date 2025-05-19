@@ -4,7 +4,7 @@ export type TProject = {
   liveSiteLink: string;
   clientCodeLink: string;
   serverCodeLink: string;
-  image?: string;
+  images?: string[];
   createdAt?: Date;
   updatedAt?: Date;
 };

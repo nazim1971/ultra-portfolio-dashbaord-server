@@ -10,6 +10,7 @@ const createBlog = async (payload: TBlog) => {
 
 const getBlogById = async (id: string) => {
   const blog = await Blog.findById(id);
+   ensureExists(blog, "Blog not found!");
   return blog;
 };
 

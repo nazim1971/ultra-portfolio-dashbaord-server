@@ -7,14 +7,20 @@ import { sendImageToCloudinary } from '../../utils/fileUploader';
 
 const createProject = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
+  payload.images = [];
+    console.log("file", req?.file);
+ if (req.files && Array.isArray(req.files)) {
+    const imageUrls = await Promise.all(
+      req.files.map(async (file) => {
+        const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e3);
+        const imageName = `${uniqueSuffix}-${req.user?.email.split("@")[0]}`;
+        const path = file?.buffer;
 
-  if (req?.file) {
-    const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e3);
-    const imageName = `${uniqueSuffix}-${req.user?.email?.split('@')[0]}`;
-    const path = req.file?.buffer;
-
-    const { secure_url } = await sendImageToCloudinary(imageName, path);
-    payload.image = secure_url;
+        const { secure_url } = await sendImageToCloudinary(imageName, path);
+        return secure_url;
+      })
+    );
+    payload.images = imageUrls;
   }
 
   const result = await ProjectService.createProject(payload);
@@ -51,16 +57,21 @@ const updateProject = catchAsync(async (req, res) => {
   const payload = req.body;
   const existing = await ProjectService.getProjectById(req.params.id);
 
-  if (req?.file) {
-    const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e3);
-    const imageName = `${uniqueSuffix}-${req.user?.email?.split('@')[0]}`;
-    const path = req.file?.buffer;
+   if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const imageUrls = await Promise.all(
+        req.files.map(async (file) => {
+          const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e3);
+          const imageName = `${uniqueSuffix}-${req.user?.email.split('@')[0]}`;
+          const path = file?.buffer;
 
-    const { secure_url } = await sendImageToCloudinary(imageName, path);
-    payload.image = secure_url;
-  } else {
-    payload.image = existing?.image;
-  }
+          const { secure_url } = await sendImageToCloudinary(imageName, path);
+          return secure_url;
+        })
+      );
+      payload.images = imageUrls;
+    } else {
+      payload.images = existing.images;
+    }
 
   const result = await ProjectService.updateProject(req.params.id, payload);
 
@@ -78,7 +89,7 @@ const deleteProject = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Project deleted successfully',
-    data: result,
+    data: []
   });
 });
 

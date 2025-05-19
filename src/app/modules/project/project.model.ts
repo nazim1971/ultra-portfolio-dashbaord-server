@@ -8,7 +8,7 @@ const projectSchema = new Schema<TProject>(
     liveSiteLink: { type: String, required: true },
     clientCodeLink: { type: String, required: true },
     serverCodeLink: { type: String, required: true },
-    image: { type: String },
+    images: { type: [String], default: [] },
   },
   {
     timestamps: true,
