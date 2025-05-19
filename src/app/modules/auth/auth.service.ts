@@ -115,6 +115,62 @@ const changePassword = async (user: any, payload: any) => {
   };
 };
 
+const forgotPassword = async (payload: { email: string }) => {
+  const userData = await User.findOne({
+    email: payload?.email,
+    status: "ACTIVE",
+  });
+
+  if (!userData) {
+    throw new StatusFullError(
+      false,
+      "NOT_FOUND",
+      httpStatus.NOT_FOUND,
+      "User not found!"
+    );
+  }
+
+  const resetPassToken = jwtHelpers.generateToken(
+    {
+      email: userData.email,
+      role: userData.role,
+      name: userData.name,
+      image: userData.image
+    },
+    config.password.resetToken,
+    config.password.resetExpiresIn
+  );
+
+  console.log({ resetPassToken });
+  const resetPassLink =
+    config.password.resetLink + `?userId=${userData.id}&token=${resetPassToken}`;
+
+  await emailSender(
+    userData.email,
+
+    `
+    <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8f9fa;">
+    <h2 style="color: #333;">Password Reset Request</h2>
+    <p>Hello <strong>${userData.email}</strong>,</p>
+    <p>We received a request to reset your password. Click the button below to reset it:</p>
+    <a href="${resetPassLink}" style="
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+    ">Reset Password</a>
+    <p style="margin-top: 20px;">If you didn't request this, you can ignore this email.</p>
+    <p>Thanks,<br/>Your Support Team</p>
+  </div>
+    `
+  );
+  console.log(resetPassLink);
+  // http://localhost:5000/reset-pass?
+};
+
 export const AuthService = {
   loginUser,
   refreshToken,
