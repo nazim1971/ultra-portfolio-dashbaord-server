@@ -1,8 +1,11 @@
 import config from "../../config";
+import { StatusFullError } from "../../error/StatusFullError";
 import { CustomPayload } from "../../interface";
+import { httpStatus } from "../../interface/httpStatus";
 import { jwtHelpers } from "../../utils/jwtHelper";
 import { User } from "../user/user.model";
 import { TLogin } from "./auth.interface";
+import bcrypt from "bcrypt";
 
 const loginUser = async (payload: TLogin) => {
   // checking if the user is exist
@@ -46,11 +49,16 @@ const loginUser = async (payload: TLogin) => {
   };
 };
 
-const refreshToken = async (token: string): Promise<{ accessToken: string}> => {
+const refreshToken = async (
+  token: string
+): Promise<{ accessToken: string }> => {
   // * Verify and decode token
-let decodedData;
+  let decodedData;
   try {
-    decodedData = jwtHelpers.verifyToken(token, config.jwt.refreshSecret) as CustomPayload;
+    decodedData = jwtHelpers.verifyToken(
+      token,
+      config.jwt.refreshSecret
+    ) as CustomPayload;
   } catch (error) {
     throw new Error("You are not authorized");
   }
@@ -58,23 +66,57 @@ let decodedData;
   // * Validate and extract user from DB.
   const user = await User.validateUser(decodedData.email);
 
-const accessToken = jwtHelpers.generateToken(
+  const accessToken = jwtHelpers.generateToken(
     {
       email: user.email,
       role: user.role,
       name: user.name,
-      image: user.image
+      image: user.image,
     },
     config.jwt.accessSecret,
     config.jwt.accessExpiresIn
   );
 
   return {
-    accessToken
+    accessToken,
+  };
+};
+
+const changePassword = async (user: any, payload: any) => {
+  const userData = await User.findOne({
+    email: payload?.email,
+    status: "ACTIVE",
+  });
+
+  if (!userData) {
+    throw new StatusFullError(
+      false,
+      "NOT_FOUND",
+      httpStatus.NOT_FOUND,
+      "User not found!"
+    );
+  }
+  const isPasswordCorrect: boolean = await bcrypt.compare(
+    payload.oldPassword,
+    userData.password
+  );
+  if (!isPasswordCorrect) {
+    throw new Error("Password Incorrect");
+  }
+  const hashPass: string = await bcrypt.hash(payload.newPassword, 12);
+
+  await User.findOneAndUpdate(
+    { email: userData?.email },
+    { password: hashPass }
+  );
+
+  return {
+    message: "Password changed successfully",
   };
 };
 
 export const AuthService = {
   loginUser,
-  refreshToken
+  refreshToken,
+  changePassword
 };
