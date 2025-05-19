@@ -12,5 +12,11 @@ AuthRouter.post('/login', AuthController.loginUser)
 //Refresh Token
 AuthRouter.post('/refresh-token', AuthController.refreshToken)
 
-//Forget Password
+//Change Password
 AuthRouter.put('/change-password',auth(USER_ROLE.ADMIN, USER_ROLE.USER) ,AuthController.changePassword)
+
+//Forget Password
+AuthRouter.post('/forgot-password', AuthController.forgotPassword)
+
+//Reset Password
+AuthRouter.post('/reset-password', AuthController.resetPassword)
