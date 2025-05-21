@@ -21,7 +21,7 @@ const userSchema = new Schema<TUser>(
     },
     role: {
       type: String,
-      default: 'USER',
+      default: "USER",
       required: true,
     },
     status: {
@@ -30,8 +30,8 @@ const userSchema = new Schema<TUser>(
       default: "ACTIVE",
     },
     name: { type: String, required: true },
-    image: { type: String },
-    contactNumber: { type: String }
+    image: { type: String, default: null },
+    contactNumber: { type: String, default: null },
   },
   {
     timestamps: true,
