@@ -38,23 +38,22 @@ const getMyProfile = async (payload: CustomPayload) => {
 
 const updateProfile = async (
   id: string,
-  payload: Partial<TUser>
+  payload: {name: string, image: string}
 ): Promise<{ accessToken: string; refreshToken: string }> => {
-  const userData = await User.findOneAndUpdate(
-    { _id: id, status: "ACTIVE" },
+  const user = await User.findOneAndUpdate(
+    { _id: id, status: 'ACTIVE' }, // assuming `status: 'ACTIVE'` is equivalent to `isActive: true`
     payload,
-    {
-      new: true, // return the updated document
-    }
+    { new: true }
   );
+   ensureExists(user, "User not found!");
+ 
 
-  //create token and send to the client
   const accessToken = jwtHelpers.generateToken(
     {
-      email: userData.email,
-      role: userData.role,
-      name: userData.name,
-      image: userData.image,
+      email: user.email,
+      role: user.role,
+      image: user.image,
+      name: user.name,
     },
     config.jwt.accessSecret,
     config.jwt.accessExpiresIn
@@ -62,10 +61,10 @@ const updateProfile = async (
 
   const refreshToken = jwtHelpers.generateToken(
     {
-      email: userData.email,
-      role: userData.role,
-      name: userData.name,
-      image: userData.image,
+      email: user.email,
+      role: user.role,
+      image: user.image,
+      name: user.name,
     },
     config.jwt.refreshSecret,
     config.jwt.refreshExpiresIn

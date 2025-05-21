@@ -38,7 +38,8 @@ const updateProfile = catchAsync(async (req, res) => {
 
   // Fetch current user profile
   const existingUser = await UserService.getMyProfile(req?.user);
-
+  console.log(existingUser, 'reee');
+  console.log(req?.user);
   if (req?.file) {
     const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e3);
     const imageName = `${uniqueSuffix}-${req.user?.email.split('@')[0]}`;
@@ -52,7 +53,7 @@ const updateProfile = catchAsync(async (req, res) => {
   }
 
   const { accessToken, refreshToken } = await UserService.updateProfile(
-    req?.user?.id,
+    existingUser?._id,
     payload
   );
 

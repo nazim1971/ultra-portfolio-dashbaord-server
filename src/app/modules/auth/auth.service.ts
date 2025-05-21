@@ -86,7 +86,7 @@ const refreshToken = async (
 
 const changePassword = async (user: any, payload: any) => {
   const userData = await User.findOne({
-    email: payload?.email,
+    email: user?.email,
     status: "ACTIVE",
   });
 

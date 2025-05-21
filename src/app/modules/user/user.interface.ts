@@ -11,6 +11,8 @@ export type TUser = {
   name: string;
   image?: string;
   contactNumber?: string;
+  accessToken?: string;
+  refreshToken?: string;
 };
 
 export interface UserStatics extends Model<TUser> {
