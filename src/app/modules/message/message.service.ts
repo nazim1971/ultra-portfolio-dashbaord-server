@@ -34,7 +34,9 @@ const getAllMessages = async (query: Record<string, unknown>) => {
 };
 
 const updateMessage = async (id: string, payload: Partial<Pick<TMessage, 'viewed'>>) => {
-  return await Message.findByIdAndUpdate(id, payload, { new: true });
+  const message = await Message.findByIdAndUpdate(id, payload, { new: true });
+  ensureExists(message, "Message not found!");
+  return message;
 };
 
 const deleteMessage = async (id: string) => {
