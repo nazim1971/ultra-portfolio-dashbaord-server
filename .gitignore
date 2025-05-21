@@ -47,6 +47,5 @@ coverage/
 # Test output
 .nyc_output/
 
-.vercel
 .DS_Store
 
