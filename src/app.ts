@@ -9,7 +9,7 @@ import globalErrorHandler from "./middlewires/globalErrorHandler";
 const app: Application = express();
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000","https://nazimuddin.vercel.app", "https://ultra-portfolio-pied.vercel.app"],
   })
 );
 app.use(cookieParser());
